@@ -43,7 +43,7 @@ Specify which binary you want to use to download videos from that feed.
 Provide a custom configuration for the binary.
 
 **pipes**
-*default: <none>*  
+*default: ""*  
 Add your pipes of necessary. For example you can achieve streaming to [VLC](http://www.videolan.org) by using:  
 `pipes: " | vlc -"` 
 
