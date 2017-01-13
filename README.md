@@ -7,7 +7,7 @@ Why not setup a Raspberry PI or a [Digital Ocean VPS](https://m.do.co/c/5027f75b
 ## Installation
 
 1. Make sure you have [Ruby](https://www.ruby-lang.org/) installed.
-2. Install a download tool[youtube-dl](https://github.com/rg3/youtube-dl), [svtplay-dl](https://github.com/spaam/svtplay-dl) and/or anything similar.
+2. Install a download tool – [youtube-dl](https://github.com/rg3/youtube-dl), [svtplay-dl](https://github.com/spaam/svtplay-dl) and/or anything similar.
 3. Create your `config.yml` and setup your feed(s).
 4. Run `ruby vcrss.rb`
 
