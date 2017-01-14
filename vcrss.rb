@@ -21,7 +21,7 @@ CONFIG["feeds"].each_with_index do |feed, i|
 
   # Create unique ID for each feed based on the URL and the number in the loop
   feed_md5 = Digest::MD5.new
-  feed_md5.update "#{feed['url']}-#{i}"
+  feed_md5.update "#{feed['url']}"
   feed_md5.hexdigest
 
   # Create log file?
@@ -35,23 +35,21 @@ CONFIG["feeds"].each_with_index do |feed, i|
   log = YAML.load_file("log/feed-#{feed_md5}.log")
 
   # Load last downloaded pub date for feed
-  if !log["#{feed_md5}_last_pub_date"]
-    last_pub_date = 0
+  if !log["#{feed_md5}_date"]
+    log_date = 0
   else
-    last_pub_date = log["#{feed_md5}_last_pub_date"].to_i
+    log_date = log["#{feed_md5}_date"].to_i
   end
 
   # Load last downloaded link for feed
-  if !log["#{feed_md5}_last_link"]
-    last_link = ''
+  if !log["#{feed_md5}_link"]
+    log_link = ''
   else
-    last_link = log["#{feed_md5}_last_link"]
+    log_link = log["#{feed_md5}_link"]
   end
 
   # Read feed
   rss = RSS::Parser.parse(feed['url'], false)
-  new_pub_date = 0
-  new_link = ''
 
   # Reverse loop to make sure that newest item comes last
   rss.items.reverse_each do |item|
@@ -68,7 +66,7 @@ CONFIG["feeds"].each_with_index do |feed, i|
       item_link = item.link.href
     end
 
-    # Check if to filter content and only download specific items
+    # Are there filters? If so check if the item passes them.
     if feed['filters']
       download = false
 
@@ -77,13 +75,13 @@ CONFIG["feeds"].each_with_index do |feed, i|
           download = true
         end
       end
+
+      next if !download
     end
 
-    # Check if the item already has been downloaded
-    if item_date >= last_pub_date
-      if item_link == last_link
-        download = false
-      end
+    # Is the item the older than the log date? If so skip the item.
+    if item_date <= log_date
+      next
     end
 
     # Time to download?
@@ -111,19 +109,15 @@ CONFIG["feeds"].each_with_index do |feed, i|
       # Run download task…
       system "#{binary}#{options} #{item_link}#{pipes}"
 
-      # Set new latest downloaded info
-      new_link = item_link
-      new_pub_date = item_date
+      # Update log
+      log_data = {
+        "#{feed_md5}_feed" => feed['url'],
+        "#{feed_md5}_updated" => Time.now.to_i,
+        "#{feed_md5}_date" => item_date,
+        "#{feed_md5}_link" => "#{item_link}",
+        "#{feed_md5}_title" => "#{item_title}"
+      }
+      File.open("log/feed-#{feed_md5}.log", 'w') {|f| f.write(log_data.to_yaml) }
     end
-  end
-
-  # Update log if any new content was downloaded
-  if new_pub_date >= last_pub_date
-    log_data = {
-      "#{feed_md5}_updated" => Time.now.to_i,
-      "#{feed_md5}_last_pub_date" => new_pub_date,
-      "#{feed_md5}_last_link" => new_link
-    }
-    File.open("log/feed-#{feed_md5}.log", 'w') {|f| f.write(log_data.to_yaml) }
   end
 end
