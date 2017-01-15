@@ -4,6 +4,9 @@ Create your own VCR/TiVo that downloads videos from RSS or Atom feeds using comm
 
 Why not setup a Raspberry PI or a [Digital Ocean VPS](https://m.do.co/c/5027f75bc292) and have this thing run continuously using a cron job?
 
+Read more about how I use it this blog post:  
+[My Raspberry Pi based VCR with RSS, youtube-dl and svtplay-dl](https://www.helloper.com/blog/2017/01/vcrss/)
+
 ## Installation
 
 1. Make sure you have [Ruby](https://www.ruby-lang.org/) installed.
